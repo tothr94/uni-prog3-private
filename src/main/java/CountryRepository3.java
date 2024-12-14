@@ -79,26 +79,49 @@ public class CountryRepository3
 
     @Override
     public Set<String> getNamesOfCountriesFilterByContinent(@NonNull Region region) {
-        return Set.of();
+        return getAll().stream()
+                .filter(country -> country.getRegion() == region)
+                .map(Country::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Set<Country> getCountriesBelowPopulationLimit(int limit) {
-        return Set.of();
+        return getAll().stream()
+                .filter(country -> country.getPopulation() < limit)
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Set<Long> getPopulationsByRegion(@NonNull Region region) {
-        return Set.of();
+        return getAll().stream()
+                .filter(country -> country.getRegion() == region)
+                .map(Country::getPopulation)
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Set<Country> getCountriesByPopulation(long population) {
-        return Set.of();
+        return getAll().stream()
+                .filter(country -> country.getPopulation() == population)
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Set<Country> getCountriesByPopulation(long lowerBound, long upperBound) {
-        return Set.of();
+        /*
+        Predicate<Country> lowerPredicate = (Country country) -> country.getPopulation() >= lowerBound;
+        Predicate<Country> upperPredicate = (Country country) -> country.getPopulation() <= upperBound;
+        Predicate<Country> compoundPredicate = lowerPredicate.and(upperPredicate);
+
+        return getAll().stream()
+                .filter(compoundPredicate)
+                .collect(Collectors.toSet());
+         */
+
+        return getAll().stream()
+                .filter(country -> country.getPopulation() >= lowerBound)
+                .filter(country -> country.getPopulation() <= upperBound)
+                .collect(Collectors.toSet());
     }
 }

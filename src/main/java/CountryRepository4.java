@@ -210,31 +210,98 @@ public class CountryRepository4
 
     @Override
     public Map<String, Map<Region, Set<Country>>> getCountriesByFirstLettersAndRegions() {
-        return Map.of();
+        return getAll().stream()
+                .collect(
+                        Collectors.groupingBy(
+                                country -> country.getName().substring(0, 1),
+                                Collectors.groupingBy(
+                                        Country::getRegion,
+                                        Collectors.toSet())
+
+                        ));
     }
 
     @Override
     public Map<Region, Set<String>> getLocalizedCountryNamesByRegions(@NonNull String locale) {
-        return Map.of();
+        return getAll().stream()
+                .collect(
+                        Collectors.groupingBy(
+                                Country::getRegion,
+                                Collectors.collectingAndThen(
+                                        Collectors.toList(),
+                                        countries -> countries.stream()
+                                                .map(country -> country.getTranslations().get(locale))
+                                                .filter(Objects::nonNull)
+                                                .collect(Collectors.toSet())
+                                )
+                        ));
     }
 
     @Override
     public Map<String, Set<String>> getCountryNamesByLocales() {
-        return Map.of();
+        return getAll().stream()
+                .map(Country::getTranslations)
+                .map(Map::entrySet)
+                .flatMap(Collection::stream)
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                entries -> entries.stream()
+                                        .map(Map.Entry::getValue)
+                                        .collect(Collectors.toSet())
+                        )
+                ));
     }
 
     @Override
     public Map<String, Set<String>> getCountryNamesByLocales(@NonNull Region region) {
-        return Map.of();
+        return getAll().stream()
+                .filter(country -> country.getRegion() == region)
+                .map(Country::getTranslations)
+                .map(Map::entrySet)
+                .flatMap(Collection::stream)
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                entries -> entries.stream()
+                                        .map(Map.Entry::getValue)
+                                        .collect(Collectors.toSet())
+                        )
+                ));
     }
 
     @Override
     public Map<Region, Optional<String>> getFirstLocalizedCountryNamesByRegions(@NonNull String locale) {
-        return Map.of();
+        return getAll().stream()
+                .collect(Collectors.groupingBy(
+                        Country::getRegion,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                countries -> countries.stream()
+                                        .map(Country::getTranslations)
+                                        .map(Map::entrySet)
+                                        .flatMap(Collection::stream)
+                                        .filter(entry -> Objects.equals(entry.getKey(), locale))
+                                        .map(Map.Entry::getValue)
+                                        .findFirst()
+                        )
+                ));
+
     }
 
     @Override
     public Map<Region, Optional<Country>> getFirstLocalizedCountriesByRegions(@NonNull String locale) {
-        return Map.of();
+        return getAll().stream()
+                .collect(Collectors.groupingBy(
+                        Country::getRegion,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                countries -> countries.stream()
+                                        .filter(country -> country.getTranslations().containsKey(locale))
+                                        .findFirst()
+                        )
+                ));
     }
 }
