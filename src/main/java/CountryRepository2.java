@@ -25,16 +25,52 @@ public class CountryRepository2
 
     @Override
     public List<Country> getCountriesOrderByPopulationDesc() {
-        return List.of();
+        /*
+        return getAll().stream()
+                .sorted(Comparator.comparing(Country::getPopulation).reversed())
+                .toList();
+
+         */
+
+        return getAll().stream()
+                .sorted(Comparator.comparing(Country::getPopulation, Comparator.reverseOrder()))
+                .toList();
     }
 
     @Override
     public List<Country> getCountriesOrderByLengthOfCapitalThenByPopulationDesc() {
-        return List.of();
+        /*
+        return getAll().stream()
+                .sorted(
+                        Comparator.<Country, Integer>comparing(
+                                        country -> country.getCapital().length()
+                                )
+                                .thenComparing(Country::getPopulation)
+                )
+                .toList();
+         */
+
+        return getAll().stream()
+                .sorted(
+                        Comparator
+                                .comparing(
+                                        (Country country) -> country.getCapital().length()
+                                )
+                                .thenComparing(Country::getPopulation)
+                )
+                .toList();
     }
 
     @Override
     public List<Country> getCountriesOrderByLengthOfCapitalThenByCapital() {
-        return List.of();
+        return getAll().stream()
+                .sorted(
+                        Comparator
+                                .comparing(
+                                        (Country country) -> country.getCapital().length()
+                                )
+                                .thenComparing(Country::getCapital)
+                )
+                .toList();
     }
 }

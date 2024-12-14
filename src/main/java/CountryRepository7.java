@@ -52,7 +52,12 @@ public class CountryRepository7
 
     @Override
     public Optional<String> getCountryNameHavingMostOfELettersIgnoringCase() {
-        return Optional.empty();
+        return getAll().stream()
+                .map(Country::getName)
+                .max(Comparator.comparing(name -> Arrays.stream(name.split(""))
+                        .map(String::toLowerCase)
+                        .filter(letter -> Objects.equals(letter, "e"))
+                        .count()));
     }
 
     @Override

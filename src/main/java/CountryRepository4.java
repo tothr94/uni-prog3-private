@@ -107,22 +107,81 @@ public class CountryRepository4
 
     @Override
     public Map<Region, Set<Country>> getCountriesByRegions() {
-        return Map.of();
+        return getAll().stream()
+                .collect(Collectors.groupingBy(
+                        Country::getRegion,
+                        Collectors.toSet()
+                ));
     }
 
     @Override
     public Map<Region, Optional<Country>> getMostPopulousCountryByRegions() {
-        return Map.of();
+        /*
+        return getAll().stream()
+                .collect(Collectors.groupingBy(
+                        Country::getRegion,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                countries -> countries.stream()
+                                        .sorted(Comparator.comparing(Country::getPopulation, Comparator.reverseOrder()))
+                                        .findFirst()
+                        )
+                ));
+         */
+
+        /*
+        return getAll().stream()
+                .collect(Collectors.groupingBy(
+                        Country::getRegion,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                countries -> countries.stream()
+                                        .min(Comparator.comparing(Country::getPopulation, Comparator.reverseOrder()))
+                        )
+                ));
+         */
+
+        return getAll().stream()
+                .collect(Collectors.groupingBy(
+                        Country::getRegion,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                countries -> countries.stream()
+                                        .max(Comparator.comparing(Country::getPopulation))
+                        )
+                ));
+
+        /*
+        return getAll().stream()
+                .collect(Collectors.groupingBy(
+                        Country::getRegion,
+                        Collectors.maxBy(Comparator.comparing(Country::getPopulation))
+                ));
+         */
     }
 
     @Override
     public Map<Region, List<Country>> getCountriesByRegionsOrderByCapitals() {
-        return Map.of();
+        return getAll().stream()
+                .collect(Collectors.groupingBy(
+                        Country::getRegion,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                countries -> countries.stream()
+                                        .sorted(Comparator.comparing(Country::getCapital))
+                                        .toList()
+                        )
+                ));
     }
 
     @Override
     public Map<Region, Set<Country>> getCountriesByRegionsFilterByPopulation(long lowerBound, long upperBound) {
-        return Map.of();
+        return getAll().stream()
+                .filter(country -> country.getPopulation() >= lowerBound && country.getPopulation() <= upperBound)
+                .collect(Collectors.groupingBy(
+                        Country::getRegion,
+                        Collectors.toUnmodifiableSet()
+                ));
     }
 
     @Override
